@@ -14,14 +14,14 @@ const Home = () => {
   const fetchTodos = async () => {
     setLoading(true);
     try {
-      const response = await fetch("https://playground.4geeks.com/todo/todos/CarlosAguayo");
+      const response = await fetch("https://playground.4geeks.com/todo/users/CarlosAguayo");
       
       if (!response.ok) {
         throw new Error(`Error HTTP: ${response.status}`);
       }
       
       const data = await response.json();
-      setTodos(data);
+      setTodos(data.todos);
     } catch (error) {
       console.error("Error al cargar las tareas:", error);
       alert("No se pudieron cargar las tareas. Verifica la consola para más detalles.");
@@ -69,7 +69,7 @@ const Home = () => {
   const deleteTask = async (taskId) => {
     setLoading(true);
     try {
-      const response = await fetch(`https://playground.4geeks.com/todo/todos/31`, {
+      const response = await fetch(`https://playground.4geeks.com/todo/todos/${taskId}`, {
         method: "DELETE"
       });
 
@@ -81,32 +81,6 @@ const Home = () => {
     } catch (error) {
       console.error("Error al eliminar la tarea:", error);
       alert("No se pudo eliminar la tarea. Verifica la consola para más detalles.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Limpiar todas las tareas
-  const clearAllTasks = async () => {
-    if (todos.length === 0) return;
-    
-    setLoading(true);
-    try {
-      // Crear un array de promesas para eliminar todas las tareas
-      const deletePromises = todos.map(todo => 
-        fetch(`https://playground.4geeks.com/todo/todos/31`, {
-          method: "DELETE"
-        })
-      );
-      
-      // Esperar a que todas las eliminaciones se completen
-      await Promise.all(deletePromises);
-      
-      // Recargar la lista de tareas
-      await fetchTodos();
-    } catch (error) {
-      console.error("Error al eliminar las tareas:", error);
-      alert("No se pudieron eliminar todas las tareas. Verifica la consola para más detalles.");
     } finally {
       setLoading(false);
     }
@@ -142,15 +116,7 @@ const Home = () => {
           <div className="card">
             <div className="card-header d-flex justify-content-between align-items-center">
               <span>Tus tareas ({todos.length})</span>
-              {todos.length > 0 && (
-                <button 
-                  className="btn btn-sm btn-danger"
-                  onClick={clearAllTasks}
-                  disabled={loading}
-                >
-                  {loading ? "Limpiando..." : "Limpiar todo"}
-                </button>
-              )}
+              
             </div>
             
             <ul className="list-group list-group-flush">
